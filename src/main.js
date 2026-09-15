@@ -111,7 +111,7 @@ if (googleMapsDatasetId) {
 
     const mapsRun = await Actor.call(GOOGLE_MAPS_ACTOR, mapsInput, {
         memory: 4096,
-        timeoutSecs: 600, // 10 minutes max — this stage is normally fast anyway
+        timeout: 600, // 10 minutes max — this stage is normally fast anyway
     });
 
     if (mapsRun.status !== 'SUCCEEDED') {
@@ -176,7 +176,7 @@ if (websiteStartUrls.length) {
 
     const contactsRun = await Actor.call(CONTACTS_ACTOR, contactsInput, {
         memory: 8192,
-        timeoutSecs: 600, // 10 minutes max — stop waiting on a handful of stubborn sites
+        timeout: 600, // 10 minutes max — stop waiting on a handful of stubborn sites
     });
 
     if (contactsRun.status !== 'SUCCEEDED') {
