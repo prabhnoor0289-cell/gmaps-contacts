@@ -1,0 +1,16 @@
+{
+    "name": "google-maps-contact-details",
+    "version": "0.1.0",
+    "type": "module",
+    "description": "Apify Actor that scrapes Google Maps places and enriches them with contact details.",
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "dependencies": {
+        "apify": "^3.2.6"
+    },
+    "scripts": {
+        "start": "node src/main.js"
+    },
+    "license": "MIT"
+}
