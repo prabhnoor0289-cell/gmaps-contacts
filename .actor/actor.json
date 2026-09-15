@@ -1,0 +1,15 @@
+{
+    "actorSpecification": 1,
+    "name": "google-maps-contact-details",
+    "title": "Google Maps Contact Details Scraper",
+    "description": "Find businesses on Google Maps and enrich them with emails, phone numbers and social media profiles scraped from their websites.",
+    "version": "0.1",
+    "meta": {
+        "templateId": "js-empty"
+    },
+    "input": "./input_schema.json",
+    "dockerfile": "./Dockerfile",
+    "storages": {
+        "dataset": "./dataset_schema.json"
+    }
+}
