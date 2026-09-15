@@ -7,6 +7,14 @@
  *  3. It runs Apify's public Contact Details Scraper on those websites
  *     to pull out emails, phones and social profiles.
  *  4. It merges the two sets of data and saves one row per business.
+ *
+ * Speed tuning applied:
+ *  - Contact scraper crawls multiple sites in parallel (maxConcurrency)
+ *  - Fewer pages per site (maxPagesPerWebsite default lowered to 5)
+ *  - Blocked sites give up after 1 retry instead of 3
+ *  - Both child actors have a hard time limit so one stuck site
+ *    can't stall the whole run
+ *  - Social-media-only "websites" are skipped before crawling
  */
 
 import { Actor, log } from 'apify';
@@ -14,6 +22,13 @@ import { Actor, log } from 'apify';
 // The two public actors we build on top of.
 const GOOGLE_MAPS_ACTOR = 'compass/crawler-google-places';
 const CONTACTS_ACTOR = 'vdrmota/contact-info-scraper';
+
+// Domains that are never worth crawling for contact details.
+const SOCIAL_DOMAINS = [
+    'facebook.com', 'instagram.com', 'linkedin.com',
+    'twitter.com', 'x.com', 'youtube.com', 'tiktok.com',
+    'pinterest.com', 'wa.me', 'wechat.com',
+];
 
 await Actor.init();
 
@@ -29,7 +44,7 @@ const {
     googleMapsDatasetId = '',
     skipPlacesWithoutWebsite = true,
     onlyPlacesWithEmail = false,
-    maxPagesPerWebsite = 10,
+    maxPagesPerWebsite = 5,
     maxContactDepth = 1,
     proxyConfiguration = { useApifyProxy: true },
     googleMapsExtraInput = {},
@@ -47,6 +62,8 @@ const toDomain = (rawUrl) => {
         return null;
     }
 };
+
+const isSocialDomain = (domain) => SOCIAL_DOMAINS.some((social) => domain.includes(social));
 
 /* ------------------------------------------------------------------ *
  * STEP 1 — get the places
@@ -92,7 +109,10 @@ if (googleMapsDatasetId) {
         maxCrawledPlacesPerSearch,
     });
 
-    const mapsRun = await Actor.call(GOOGLE_MAPS_ACTOR, mapsInput, { memory: 4096 });
+    const mapsRun = await Actor.call(GOOGLE_MAPS_ACTOR, mapsInput, {
+        memory: 4096,
+        timeoutSecs: 600, // 10 minutes max — this stage is normally fast anyway
+    });
 
     if (mapsRun.status !== 'SUCCEEDED') {
         log.warning(`Google Maps Scraper finished with status ${mapsRun.status}. `
@@ -122,6 +142,7 @@ const domainToPlaces = new Map(); // domain -> [place, place, ...]
 for (const place of places) {
     const domain = toDomain(place.website);
     if (!domain) continue;
+    if (isSocialDomain(domain)) continue; // skip Facebook/Instagram/etc pages, never worth crawling
     if (!domainToPlaces.has(domain)) domainToPlaces.set(domain, []);
     domainToPlaces.get(domain).push(place);
 }
@@ -146,14 +167,21 @@ if (websiteStartUrls.length) {
         considerChildFrames: true,
         maximumLeadsEnrichmentRecords: 0,
         proxyConfig: proxyConfiguration,
+        maxRequestRetries: 1,   // don't waste time retrying sites that are actively blocking us
+        maxConcurrency: 20,     // crawl many websites in parallel instead of one at a time
+        minConcurrency: 5,
     };
 
     log.info('Starting Contact Details Scraper...');
 
-    const contactsRun = await Actor.call(CONTACTS_ACTOR, contactsInput, { memory: 4096 });
+    const contactsRun = await Actor.call(CONTACTS_ACTOR, contactsInput, {
+        memory: 8192,
+        timeoutSecs: 600, // 10 minutes max — stop waiting on a handful of stubborn sites
+    });
 
     if (contactsRun.status !== 'SUCCEEDED') {
-        log.warning(`Contact Details Scraper finished with status ${contactsRun.status}.`);
+        log.warning(`Contact Details Scraper finished with status ${contactsRun.status}. `
+            + 'Continuing with whatever contact data was collected so far.');
     }
 
     const { items } = await client.dataset(contactsRun.defaultDatasetId).listItems();
