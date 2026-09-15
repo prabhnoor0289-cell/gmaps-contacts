@@ -1,0 +1,105 @@
+{
+    "title": "Google Maps Contact Details Scraper",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "searchStringsArray": {
+            "title": "Search terms",
+            "type": "array",
+            "description": "What to search for on Google Maps, e.g. 'dentist' or 'italian restaurant'. One term per line.",
+            "editor": "stringList",
+            "prefill": ["dentist"],
+            "sectionCaption": "Search"
+        },
+        "locationQuery": {
+            "title": "Location",
+            "type": "string",
+            "description": "Where to search, e.g. 'Chandigarh, India' or 'New York, USA'.",
+            "editor": "textfield",
+            "prefill": "Chandigarh, India"
+        },
+        "maxCrawledPlacesPerSearch": {
+            "title": "Max places per search term",
+            "type": "integer",
+            "description": "How many businesses to collect for each search term. Start small while testing.",
+            "default": 20,
+            "minimum": 1,
+            "maximum": 5000
+        },
+        "language": {
+            "title": "Language",
+            "type": "string",
+            "description": "Language of the Google Maps results.",
+            "editor": "select",
+            "default": "en",
+            "enum": ["en", "es", "fr", "de", "it", "pt", "nl", "hi", "ja", "zh-CN"],
+            "enumTitles": ["English", "Spanish", "French", "German", "Italian", "Portuguese", "Dutch", "Hindi", "Japanese", "Chinese"]
+        },
+        "startUrls": {
+            "title": "Google Maps URLs (optional)",
+            "type": "array",
+            "description": "Paste specific Google Maps search or place URLs instead of using search terms.",
+            "editor": "requestListSources",
+            "sectionCaption": "Advanced input sources",
+            "sectionDescription": "Optional. Leave empty if you are using search terms above."
+        },
+        "placeIds": {
+            "title": "Place IDs (optional)",
+            "type": "array",
+            "description": "Google Place IDs, if you already have them.",
+            "editor": "stringList"
+        },
+        "googleMapsDatasetId": {
+            "title": "Existing Google Maps dataset ID (optional)",
+            "type": "string",
+            "description": "If you already ran Google Maps Scraper, paste its dataset ID here to skip straight to contact enrichment.",
+            "editor": "textfield"
+        },
+        "maxPagesPerWebsite": {
+            "title": "Max pages to scan per website",
+            "type": "integer",
+            "description": "Higher finds more emails but costs more and takes longer.",
+            "default": 10,
+            "minimum": 1,
+            "maximum": 100,
+            "sectionCaption": "Contact scraping options"
+        },
+        "maxContactDepth": {
+            "title": "Crawl depth",
+            "type": "integer",
+            "description": "How many clicks deep to follow links on each website. 1 is usually enough.",
+            "default": 1,
+            "minimum": 0,
+            "maximum": 3
+        },
+        "skipPlacesWithoutWebsite": {
+            "title": "Skip businesses with no website",
+            "type": "boolean",
+            "description": "Businesses with no website can never have an email, so they are usually not worth keeping.",
+            "default": true
+        },
+        "onlyPlacesWithEmail": {
+            "title": "Only keep results that have an email",
+            "type": "boolean",
+            "description": "Turn on for a clean lead list. Turn off to keep every business.",
+            "default": false
+        },
+        "proxyConfiguration": {
+            "title": "Proxy configuration",
+            "type": "object",
+            "description": "Apify Proxy is strongly recommended.",
+            "editor": "proxy",
+            "default": { "useApifyProxy": true },
+            "sectionCaption": "Proxy"
+        },
+        "googleMapsExtraInput": {
+            "title": "Extra Google Maps Scraper input (advanced)",
+            "type": "object",
+            "description": "Any additional fields to pass through to the Google Maps Scraper, as JSON.",
+            "editor": "json",
+            "default": {},
+            "sectionCaption": "Expert settings"
+        }
+    },
+    "required": []
+}
