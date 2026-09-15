@@ -1,0 +1,47 @@
+{
+    "actorSpecification": 1,
+    "views": {
+        "overview": {
+            "title": "Leads",
+            "transformation": {
+                "fields": [
+                    "title",
+                    "categoryName",
+                    "emails",
+                    "phone",
+                    "phonesFromWebsite",
+                    "website",
+                    "address",
+                    "city",
+                    "postalCode",
+                    "totalScore",
+                    "reviewsCount",
+                    "linkedIns",
+                    "facebooks",
+                    "instagrams",
+                    "url"
+                ]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "title": { "label": "Business" },
+                    "categoryName": { "label": "Category" },
+                    "emails": { "label": "Emails" },
+                    "phone": { "label": "Phone (Maps)" },
+                    "phonesFromWebsite": { "label": "Phones (website)" },
+                    "website": { "label": "Website" },
+                    "address": { "label": "Address" },
+                    "city": { "label": "City" },
+                    "postalCode": { "label": "Postal code" },
+                    "totalScore": { "label": "Rating" },
+                    "reviewsCount": { "label": "Reviews" },
+                    "linkedIns": { "label": "LinkedIn" },
+                    "facebooks": { "label": "Facebook" },
+                    "instagrams": { "label": "Instagram" },
+                    "url": { "label": "Google Maps URL" }
+                }
+            }
+        }
+    }
+}
